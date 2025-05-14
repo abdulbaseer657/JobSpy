@@ -19,6 +19,7 @@ from .. import Scraper, ScraperInput, Site
 from ..utils import count_urgent_words, extract_emails_from_text, get_enum_from_job_type, currency_parser
 from ..exceptions import LinkedInException
 from ...jobs import JobPost, Location, JobResponse, JobType, Country, Compensation
+from security import safe_requests
 
 
 class LinkedInScraper(Scraper):
@@ -74,7 +75,7 @@ class LinkedInScraper(Scraper):
             retries = 0
             while retries < self.MAX_RETRIES:
                 try:
-                    response = requests.get(
+                    response = safe_requests.get(
                         f"{self.url}/jobs-guest/jobs/api/seeMoreJobPostings/search?",
                         params=params,
                         allow_redirects=True,
@@ -208,7 +209,7 @@ class LinkedInScraper(Scraper):
         :return: description or None
         """
         try:
-            response = requests.get(job_page_url, timeout=5, proxies=self.proxy)
+            response = safe_requests.get(job_page_url, timeout=5, proxies=self.proxy)
             response.raise_for_status()
         except requests.HTTPError as e:
             if hasattr(e, "response") and e.response is not None:
